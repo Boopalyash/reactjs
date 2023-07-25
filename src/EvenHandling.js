@@ -25,7 +25,7 @@ const EventHandling = () => {
         backgroundColor: "#f0f0f0",
       }}
     >
-      <h1 style={{ fontSize: "24px", marginBottom: "20px" }}>Event Handling</h1>
+      <h1 style={{ fontSize: "24px", marginBottom: "20px" }}>Event Handling Task</h1>
       <button
         style={{
           padding: "10px 20px",
