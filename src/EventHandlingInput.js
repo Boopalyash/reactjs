@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const EventHandlingInput = () => {
   const [formData, setFormData] = useState({
@@ -6,11 +6,14 @@ const EventHandlingInput = () => {
     lastName: "",
     email: "",
     password: "",
+    phoneNumber: "",
     gender: "male",
+    state: "tamilnadu",
     city: "namakkal",
   });
 
   const [consoleOutput, setConsoleOutput] = useState([]);
+  const [cityOptions, setCityOptions] = useState([]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -22,12 +25,44 @@ const EventHandlingInput = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    const newOutput = [...consoleOutput, JSON.stringify(formData)];
-    setConsoleOutput(newOutput);
+    setConsoleOutput([JSON.stringify(formData)]);
   };
 
+  const handleInput = (event) => {
+    const input = event.target;
+    const numericValue = input.value.replace(/\D/g, "");
+    setFormData((previousFormData) => ({
+      ...previousFormData,
+      [input.name]: numericValue,
+    }));
+  };
+
+  useEffect(() => {
+    if (formData.state === "tamilnadu") {
+      setCityOptions([
+        { value: "madurai", label: "Madurai" },
+        { value: "chennai", label: "Chennai" },
+        { value: "coimbatore", label: "Coimbatore" },
+      ]);
+    } else if (formData.state === "kerala") {
+      setCityOptions([
+        { value: "kochi", label: "Kochi" },
+        { value: "trivandrum", label: "Trivandrum" },
+        { value: "kottayam", label: "Kottayam" },
+      ]);
+    } else if (formData.state === "karnataka") {
+      setCityOptions([
+        { value: "bangalore", label: "Bangalore" },
+        { value: "mysore", label: "Mysore" },
+        { value: "mangalore", label: "Mangalore" },
+      ]);
+    } else {
+      setCityOptions([]);
+    }
+  }, [formData.state]);
+
   return (
-    <div>
+    <div style={styles.container}>
       <form onSubmit={handleSubmit} style={styles.form}>
         <div style={styles.formGroup}>
           <label style={styles.label}>
@@ -83,6 +118,20 @@ const EventHandlingInput = () => {
         </div>
         <div style={styles.formGroup}>
           <label style={styles.label}>
+            Phone Number:
+            <input
+              type="tel"
+              name="phoneNumber"
+              value={formData.phoneNumber}
+              onInput={handleInput}
+              style={styles.input}
+              required
+            />
+          </label>
+        </div>
+
+        <div style={styles.formGroup}>
+          <label style={styles.label}>
             Gender:
             <select
               name="gender"
@@ -96,8 +145,42 @@ const EventHandlingInput = () => {
             </select>
           </label>
         </div>
+
         <div style={styles.formGroup}>
-          <label style={styles.label}>City:</label>
+          <label style={styles.label}>State:</label>
+          <select
+            name="state"
+            value={formData.state}
+            onChange={handleChange}
+            style={styles.input}
+          >
+            <option value="tamilnadu">Tamilnadu</option>
+            <option value="kerala">Kerala</option>
+            <option value="karnataka">karnataka</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        {cityOptions.length > 0 && (
+          <div style={styles.formGroup}>
+            <label style={styles.label}>City:</label>
+            <select
+              name="city"
+              value={formData.city}
+              onChange={handleChange}
+              style={styles.input}
+            >
+              {cityOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
+        <div style={styles.formGroup}>
+          <label style={styles.label}>Other:</label>
           <div>
             <label>
               <input
@@ -134,6 +217,7 @@ const EventHandlingInput = () => {
             </label>
           </div>
         </div>
+
         <button type="submit" style={styles.button}>
           Submit
         </button>
@@ -148,24 +232,28 @@ const EventHandlingInput = () => {
   );
 };
 
+export default EventHandlingInput;
+
 const styles = {
+  container: {
+    background: "linear-gradient(45deg, #ff8080, #80b3ff)",
+    minHeight: "100vh",
+  },
   form: {
     maxWidth: "300px",
     margin: "0 auto",
-    marginTop: "100px",
   },
   formGroup: {
-    marginBottom: "10px",
+    marginBottom: "15px",
   },
   label: {
     fontSize: "14px",
     fontWeight: "bold",
-    display: "block",
   },
   input: {
     padding: "8px",
     border: "1px solid #ccc",
-    borderRadius: "4px",
+    borderRadius: "20px",
     width: "100%",
   },
   button: {
@@ -174,7 +262,7 @@ const styles = {
     backgroundColor: "#007bff",
     color: "#fff",
     border: "none",
-    borderRadius: "4px",
+    borderRadius: "10px",
     cursor: "pointer",
   },
   console: {
@@ -183,5 +271,3 @@ const styles = {
     backgroundColor: "#f2f2f2",
   },
 };
-
-export default EventHandlingInput;
