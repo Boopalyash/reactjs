@@ -1,56 +1,135 @@
 import React, { useState, useEffect } from "react";
 
 const EventHandlingInput = () => {
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    phoneNumber: "",
-    gender: "male",
-    state: "tamilnadu",
-    city: "namakkal",
-  });
-
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [gender, setGender] = useState("male");
+  const [state, setState] = useState("tamilnadu");
+  const [city, setCity] = useState("namakkal");
   const [consoleOutput, setConsoleOutput] = useState([]);
   const [cityOptions, setCityOptions] = useState([]);
+  const [errors, setErrors] = useState({});
 
   const handleChange = (event) => {
     const { name, value } = event.target;
-    setFormData((previousFormData) => ({
-      ...previousFormData,
-      [name]: value,
-    }));
+    if (name === "firstName") {
+      setFirstName(value);
+    } else if (name === "lastName") {
+      setLastName(value);
+    } else if (name === "email") {
+      setEmail(value);
+    } else if (name === "password") {
+      setPassword(value);
+    } else if (name === "phoneNumber") {
+      setPhoneNumber(value);
+    } else if (name === "gender") {
+      setGender(value);
+    } else if (name === "state") {
+      setState(value);
+      setCity("");
+    } else if (name === "city") {
+      setCity(value);
+    }
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    setConsoleOutput([JSON.stringify(formData)]);
+    const isValid = validateForm();
+    if (isValid) {
+      setConsoleOutput([
+        JSON.stringify({
+          firstName,
+          lastName,
+          email,
+          password,
+          phoneNumber,
+          gender,
+          state,
+          city,
+        }),
+      ]);
+    }
+  };
+
+  const validateForm = () => {
+    let isValid = true;
+    const errors = {};
+
+    // Validate First Name
+
+    if (!firstName.trim()) {
+      errors.firstName = "First Name is required ";
+      isValid = false;
+    } else if (firstName.length < 5) {
+      errors.firstName = "Minimum 5 characters required";
+      isValid = false;
+    }
+
+    // Validate Last Name
+    if (!lastName.length) {
+      errors.lastName = "Last Name is required";
+      isValid = false;
+    }
+
+    // Validate Email
+    if (!email.length) {
+      errors.email = "Email is required";
+      isValid = false;
+    } else if (!isValidEmail(email)) {
+      errors.email = "Invalid Email";
+      isValid = false;
+    }
+
+    // Validate Password
+    if (!password.length) {
+      errors.password = "Password is required";
+      isValid = false;
+    } else if (password.length < 6) {
+      errors.password = "Password must be at least 6 characters long";
+      isValid = false;
+    }
+
+    // Validate Phone Number
+    if (!phoneNumber.length) {
+      errors.phoneNumber = "Phone Number is required";
+      isValid = false;
+    } else if (phoneNumber.length < 10) {
+      errors.phoneNumber = "Phone Number must be 10 characters long";
+      isValid = false;
+    }
+
+    setErrors(errors);
+    return isValid;
+  };
+
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
   };
 
   const handleInput = (event) => {
     const input = event.target;
     const numericValue = input.value.replace(/\D/g, "");
-    setFormData((previousFormData) => ({
-      ...previousFormData,
-      [input.name]: numericValue,
-    }));
+    setPhoneNumber(numericValue);
   };
 
   useEffect(() => {
-    if (formData.state === "tamilnadu") {
+    if (state === "tamilnadu") {
       setCityOptions([
         { value: "madurai", label: "Madurai" },
         { value: "chennai", label: "Chennai" },
         { value: "coimbatore", label: "Coimbatore" },
       ]);
-    } else if (formData.state === "kerala") {
+    } else if (state === "kerala") {
       setCityOptions([
         { value: "kochi", label: "Kochi" },
         { value: "trivandrum", label: "Trivandrum" },
         { value: "kottayam", label: "Kottayam" },
       ]);
-    } else if (formData.state === "karnataka") {
+    } else if (state === "karnataka") {
       setCityOptions([
         { value: "bangalore", label: "Bangalore" },
         { value: "mysore", label: "Mysore" },
@@ -59,7 +138,7 @@ const EventHandlingInput = () => {
     } else {
       setCityOptions([]);
     }
-  }, [formData.state]);
+  }, [state]);
 
   return (
     <div style={styles.container}>
@@ -70,12 +149,13 @@ const EventHandlingInput = () => {
             <input
               type="text"
               name="firstName"
-              value={formData.firstName}
+              value={firstName}
               onChange={handleChange}
               style={styles.input}
               required
             />
           </label>
+          {errors.firstName && <p style={styles.error}>{errors.firstName}</p>}
         </div>
         <div style={styles.formGroup}>
           <label style={styles.label}>
@@ -83,12 +163,13 @@ const EventHandlingInput = () => {
             <input
               type="text"
               name="lastName"
-              value={formData.lastName}
+              value={lastName}
               onChange={handleChange}
               style={styles.input}
               required
             />
           </label>
+          {errors.lastName && <p style={styles.error}>{errors.lastName}</p>}
         </div>
         <div style={styles.formGroup}>
           <label style={styles.label}>
@@ -96,12 +177,13 @@ const EventHandlingInput = () => {
             <input
               type="email"
               name="email"
-              value={formData.email}
+              value={email}
               onChange={handleChange}
               style={styles.input}
               required
             />
           </label>
+          {errors.email && <p style={styles.error}>{errors.email}</p>}
         </div>
         <div style={styles.formGroup}>
           <label style={styles.label}>
@@ -109,12 +191,13 @@ const EventHandlingInput = () => {
             <input
               type="password"
               name="password"
-              value={formData.password}
+              value={password}
               onChange={handleChange}
               style={styles.input}
               required
             />
           </label>
+          {errors.password && <p style={styles.error}>{errors.password}</p>}
         </div>
         <div style={styles.formGroup}>
           <label style={styles.label}>
@@ -122,20 +205,22 @@ const EventHandlingInput = () => {
             <input
               type="tel"
               name="phoneNumber"
-              value={formData.phoneNumber}
+              value={phoneNumber}
               onInput={handleInput}
               style={styles.input}
               required
             />
           </label>
+          {errors.phoneNumber && (
+            <p style={styles.error}>{errors.phoneNumber}</p>
+          )}
         </div>
-
         <div style={styles.formGroup}>
           <label style={styles.label}>
             Gender:
             <select
               name="gender"
-              value={formData.gender}
+              value={gender}
               onChange={handleChange}
               style={styles.input}
             >
@@ -145,18 +230,17 @@ const EventHandlingInput = () => {
             </select>
           </label>
         </div>
-
         <div style={styles.formGroup}>
           <label style={styles.label}>State:</label>
           <select
             name="state"
-            value={formData.state}
+            value={state}
             onChange={handleChange}
             style={styles.input}
           >
             <option value="tamilnadu">Tamilnadu</option>
             <option value="kerala">Kerala</option>
-            <option value="karnataka">karnataka</option>
+            <option value="karnataka">Karnataka</option>
             <option value="other">Other</option>
           </select>
         </div>
@@ -166,7 +250,7 @@ const EventHandlingInput = () => {
             <label style={styles.label}>City:</label>
             <select
               name="city"
-              value={formData.city}
+              value={city}
               onChange={handleChange}
               style={styles.input}
             >
@@ -187,7 +271,7 @@ const EventHandlingInput = () => {
                 type="radio"
                 name="city"
                 value="namakkal"
-                checked={formData.city === "namakkal"}
+                checked={city === "namakkal"}
                 onChange={handleChange}
                 style={{ marginRight: "4px" }}
               />
@@ -198,7 +282,7 @@ const EventHandlingInput = () => {
                 type="radio"
                 name="city"
                 value="salem"
-                checked={formData.city === "salem"}
+                checked={city === "salem"}
                 onChange={handleChange}
                 style={{ marginRight: "4px", marginLeft: "10px" }}
               />
@@ -209,7 +293,7 @@ const EventHandlingInput = () => {
                 type="radio"
                 name="city"
                 value="karur"
-                checked={formData.city === "karur"}
+                checked={city === "karur"}
                 onChange={handleChange}
                 style={{ marginRight: "4px", marginLeft: "10px" }}
               />
@@ -236,7 +320,7 @@ export default EventHandlingInput;
 
 const styles = {
   container: {
-    background: "linear-gradient(45deg, #ff8080, #80b3ff)",
+    background: "linear-gradient(180deg, #80b3ff, #ff8080)",
     minHeight: "100vh",
   },
   form: {
@@ -269,5 +353,9 @@ const styles = {
     marginTop: "20px",
     padding: "10px",
     backgroundColor: "#f2f2f2",
+  },
+  error: {
+    color: "white",
+    fontSize: "15px",
   },
 };
